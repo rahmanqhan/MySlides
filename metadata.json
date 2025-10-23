@@ -1,0 +1,5 @@
+{
+  "name": "MySlides",
+  "description": "MySlides is an AI-powered application that generates presentations from a single text prompt. Users can input a topic, review and edit an AI-generated outline, and then generate a full slide deck with text and images.",
+  "requestFramePermissions": []
+}
