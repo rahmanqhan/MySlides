@@ -76,15 +76,18 @@ const PromptScreen: React.FC<PromptScreenProps> = ({ onGenerate, error }) => {
   };
 
   return (
+  <>
     <div className="w-full max-w-4xl text-center flex flex-col items-center justify-center animate-fade-in p-4">
-      <h1 className="text-5xl sm:text-6xl md:text-7xl font-michroma mb-4 sm:mb-6 tracking-wider logo-animated-gradient leading-tight sm:leading-normal pb-2">MySlides</h1>
-      
+      <h1 className="text-5xl sm:text-6xl md:text-7xl font-michroma mb-4 sm:mb-6 tracking-wider logo-animated-gradient leading-tight sm:leading-normal pb-2">
+        MySlides
+      </h1>
+
       <p className="text-gray-400 mb-6 sm:mb-8 text-sm sm:text-lg">
         Say it once. Get your slides in seconds.
       </p>
 
       <form onSubmit={handleSubmit} className="w-full max-w-3xl">
-       <div className="flex items-center gap-2 bg-black/60 backdrop-blur-md p-2 sm:p-3 rounded-xl shadow-lg border border-white/30 hover:border-white/60 transition-all duration-500">
+        <div className="flex items-center gap-2 bg-black/60 backdrop-blur-md p-2 sm:p-3 rounded-xl shadow-lg border border-white/30 hover:border-white/60 transition-all duration-500">
           <input
             type="text"
             value={topic}
@@ -110,12 +113,12 @@ const PromptScreen: React.FC<PromptScreenProps> = ({ onGenerate, error }) => {
 
       {error && <p className="text-red-400 mt-6">{error}</p>}
     </div>
-    
+
     <div className="fixed bottom-5 left-1/2 -translate-x-1/2 text-gray-600 text-sm font-sans">
-        @rahmanqhan
-      </div>
-    </>
-  );
+      @rahmanqhan
+    </div>
+  </>
+);
 };
 
 export default PromptScreen;
