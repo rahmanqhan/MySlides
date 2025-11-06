@@ -110,6 +110,7 @@ const PromptScreen: React.FC<PromptScreenProps> = ({ onGenerate, error }) => {
 
       {error && <p className="text-red-400 mt-6">{error}</p>}
     </div>
+    
     <div className="fixed bottom-5 left-1/2 -translate-x-1/2 text-gray-600 text-sm font-sans">
         @rahmanqhan
       </div>
