@@ -1,0 +1,5 @@
+{
+  "name": "MySlides",
+  "description": "A web application that generates presentations from a single text prompt, Users can input a topic, and the AI will create a structured slide deck with text and relevant images.",
+  "requestFramePermissions": []
+}
