@@ -4,7 +4,6 @@ import { CardData } from "../types";
 // Initialize Gemini model using your Google AI Studio API key
 const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY);
 const textModel = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
-const imageModel = genAI.getGenerativeModel({ model: "gemini-2.5-flash-image" });
 
 // ---------- Generate Basic Text ----------
 export async function generateSlides(prompt: string): Promise<string> {
@@ -12,37 +11,8 @@ export async function generateSlides(prompt: string): Promise<string> {
   return result.response.text();
 }
 
-// ---------- Generate Image for Each Slide ----------
+// ---------- Generate Image for Each Slide (Hugging Face Only) ----------
 export async function generateImageForPrompt(prompt: string): Promise<string | undefined> {
-  try {
-    // First, try using Gemini's image model
-    const imageModel = genAI.getGenerativeModel({ model: "gemini-2.5-flash-image" });
-
-    const result = await imageModel.generateContent([
-      { text: `Generate a presentation background image for: ${prompt}` }
-    ]);
-
-    // Check for inline base64 data
-    const imagePart = result.response.candidates?.[0]?.content?.parts?.find(
-        (part: any) => part.inlineData
-    );
-
-    if (imagePart?.inlineData) {
-      return `data:${imagePart.inlineData.mimeType};base64,${imagePart.inlineData.data}`;
-    }
-
-    console.warn("No inline image data found. Falling back to external generator...");
-  } catch (err) {
-    console.warn("Gemini image model not available or failed:", err);
-  }
-
-  // ---- FALLBACK: Hugging Face Image API (completely free) ----
-  const HF_API_KEY = import.meta.env.VITE_HUGGINGFACE_KEY;
-  if (!HF_API_KEY) {
-    console.warn("No Hugging Face key provided. Skipping image generation.");
-    return undefined;
-  }
-
   try {
     const response = await fetch("/api/generate-image", {
       method: "POST",
@@ -50,24 +20,32 @@ export async function generateImageForPrompt(prompt: string): Promise<string | u
       body: JSON.stringify({ prompt }),
     });
 
-    if (!response.ok) throw new Error("Hugging Face image request failed");
-    const blob = await response.blob();
-    return URL.createObjectURL(blob);
+    if (!response.ok) {
+      console.error("Hugging Face image request failed:", await response.text());
+      return undefined;
+    }
+
+    const data = await response.json();
+    if (data.image) {
+      return data.image;
+    } else {
+      console.warn("No image returned from Hugging Face API");
+      return undefined;
+    }
   } catch (err) {
-    console.error("Hugging Face fallback failed:", err);
+    console.error("Error generating image via Hugging Face:", err);
     return undefined;
   }
 }
 
 // ---------- Generate Full Presentation ----------
 export const generatePresentationText = async (
-    topic: string,
-    updateLoadingMessage: (message: string) => void
+  topic: string,
+  updateLoadingMessage: (message: string) => void
 ): Promise<CardData[]> => {
   updateLoadingMessage("Drafting presentation outline...");
 
-  // 🧠 System Instruction — Your presentation design prompt
-  const systemInstruction = `You are an expert presentation designer, tasked with creating a compelling, well-structured 10-slide presentation on the user's topic.
+  const systemInstruction =`You are an expert presentation designer, tasked with creating a compelling, well-structured 10-slide presentation on the user's topic.
 
 For each slide, you must provide:
 1.  A 'title' for the slide.
@@ -145,41 +123,35 @@ Your markdown content MUST follow these rules strictly to ensure correct renderi
 
 Ensure the presentation flows logically, is visually engaging, and contains exactly 10 slides.`;
 
-  // Combine everything into a single plain-text prompt (no role/parts)
   const prompt = `
 ${systemInstruction}
 
 Now create a structured JSON array of exactly 10 slides about: ${topic}.
-Each slide should follow the specified structure strictly.
+Each slide must follow the defined format exactly.
 `;
 
   const result = await textModel.generateContent(prompt);
-
   updateLoadingMessage("Parsing content structure...");
 
-// --- Get text result ---
+  // --- Extract JSON ---
   let rawText = result.response.text().trim();
-
-// --- 🧹 Clean out markdown formatting (```json ... ```) ---
   rawText = rawText
-      .replace(/^```json\s*/i, "")   // remove starting ```json
-      .replace(/^```/, "")           // remove stray starting ```
-      .replace(/```$/, "")           // remove ending ```
-      .replace(/```/g, "")           // remove any stray code blocks
-      .trim();
+    .replace(/^```json\s*/i, "")
+    .replace(/^```/, "")
+    .replace(/```$/, "")
+    .replace(/```/g, "")
+    .trim();
 
-// --- 🧪 Parse safely ---
+  // --- Parse JSON safely ---
   let structuredResponse: any[];
   try {
     structuredResponse = JSON.parse(rawText);
   } catch (e) {
     console.error("Failed to parse JSON response:", rawText);
-    throw new Error(
-        "The AI returned formatted text instead of JSON. Please try again."
-    );
+    throw new Error("The AI returned formatted text instead of valid JSON. Please try again.");
   }
 
-// --- Convert JSON into CardData format ---
+  // --- Convert JSON into CardData format ---
   const cards: CardData[] = structuredResponse.map((item: any, index: number) => ({
     id: `card-${index}-${Date.now()}`,
     title: item.title,
@@ -189,15 +161,12 @@ Each slide should follow the specified structure strictly.
   }));
 
   return cards;
-
-
-  return cards;
 };
 
 // ---------- Generate Presentation Images ----------
 export const generatePresentationImages = async (
-    cards: CardData[],
-    onCardUpdate: (card: CardData) => void
+  cards: CardData[],
+  onCardUpdate: (card: CardData) => void
 ): Promise<void> => {
   for (const card of cards) {
     if (card.imagePrompt) {
