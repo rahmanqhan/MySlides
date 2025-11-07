@@ -12,7 +12,7 @@ const LoadingScreen: React.FC<LoadingScreenProps> = ({ message }) => {
 
       {/* Message */}
       <h2 className="text-xl font-semibold mb-2">{message}</h2>
-      <p className="text-neutral-400 text-sm">PLease wait..</p>
+      <p className="text-neutral-400 text-sm">Please wait..</p>
 
       {/* Inline CSS for Loader */}
       <style>{`
