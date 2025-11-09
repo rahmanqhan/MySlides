@@ -12,17 +12,17 @@ export default async function handler(req, res) {
     // ✅ Correct Hugging Face Router endpoint and format
     const HF_URL = "https://router.huggingface.co/hf-inference";
 
-    const response = await fetch(HF_URL, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${process.env.HF_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "stabilityai/stable-diffusion-2",
-        inputs: prompt,
-      }),
-    });
+const response = await fetch(HF_URL, {
+  method: "POST",
+  headers: {
+    Authorization: `Bearer ${process.env.HF_API_KEY}`,
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    model: "stabilityai/stable-diffusion-2",
+    inputs: prompt,
+  }),
+});
 
     if (!response.ok) {
       const errMsg = await response.text();
