@@ -11,7 +11,7 @@ export default async function handler(req, res) {
 
     // New official Router endpoint
     const HF_URL =
-      "https://router.huggingface.co/hf-inference/models/stabilityai/stable-diffusion-2";
+      "https://router.huggingface.co/hf-inference/stabilityai/stable-diffusion-2";
 
     const response = await fetch(HF_URL, {
       method: "POST",
