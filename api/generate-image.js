@@ -10,19 +10,16 @@ export default async function handler(req, res) {
     }
 
     // ✅ Correct new Hugging Face Router endpoint
-    const HF_URL = "https://router.huggingface.co/hf-inference";
+   const HF_URL = "https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-2";
 
     const response = await fetch(HF_URL, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${process.env.HF_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "stabilityai/stable-diffusion-2",
-        inputs: prompt,
-      }),
-    });
+  method: "POST",
+  headers: {
+    Authorization: `Bearer ${process.env.HF_API_KEY}`,
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({ inputs: prompt }),
+});
 
     if (!response.ok) {
       const errMsg = await response.text();
