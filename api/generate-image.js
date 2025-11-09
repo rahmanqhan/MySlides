@@ -9,10 +9,9 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: "Missing prompt" });
     }
 
-    // ✅ Correct new Hugging Face Router endpoint
    const HF_URL = "https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-2";
 
-    const response = await fetch(HF_URL, {
+const response = await fetch(HF_URL, {
   method: "POST",
   headers: {
     Authorization: `Bearer ${process.env.HF_API_KEY}`,
@@ -20,7 +19,7 @@ export default async function handler(req, res) {
   },
   body: JSON.stringify({ inputs: prompt }),
 });
-
+    
     if (!response.ok) {
       const errMsg = await response.text();
       console.error("HF error:", errMsg);
