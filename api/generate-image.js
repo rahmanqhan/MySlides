@@ -8,7 +8,7 @@ export default async function handler(req, res) {
     if (!prompt) return res.status(400).json({ error: "Missing prompt" });
 
     const response = await fetch(
-      "https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-2",
+      "https://router.huggingface.co/hf-inference/models/stabilityai/stable-diffusion-2",
       {
         method: "POST",
         headers: {
