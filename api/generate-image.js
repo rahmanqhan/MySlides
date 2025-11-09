@@ -9,7 +9,7 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: "Missing prompt" });
     }
 
-    // ✅ Correct Router endpoint and JSON structure
+    // Router endpoint and JSON structure
     const HF_URL = "https://router.huggingface.co/hf-inference";
 
     const response = await fetch(HF_URL, {
@@ -20,8 +20,8 @@ export default async function handler(req, res) {
       },
       body: JSON.stringify({
         model: "stabilityai/stable-diffusion-2",
-        parameters: {},      // optional, but Router expects a key here
-        input: prompt,       // ✅ Router expects "input", not "inputs"
+        parameters: {},    
+        input: prompt,   
       }),
     });
 
