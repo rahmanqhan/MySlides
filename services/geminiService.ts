@@ -1,7 +1,7 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { CardData } from "../types";
 
-// Initialize Gemini model using your Google AI Studio API key
+// Initialize Gemini model using Google AI Studio API key
 const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY);
 const textModel = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
@@ -11,7 +11,7 @@ export async function generateSlides(prompt: string): Promise<string> {
   return result.response.text();
 }
 
-// ---------- Generate Image for Each Slide (Hugging Face Only) ----------
+// ---------- Generate Image for Each Slide ----------
 export async function generateImageForPrompt(prompt: string): Promise<string | undefined> {
   try {
     const response = await fetch("/api/generate-image", {
