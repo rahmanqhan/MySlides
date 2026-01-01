@@ -1,38 +1,22 @@
 
 import { CardData } from "../types";
 
-// ===================== OpenRouter Setup =====================
-const OPENROUTER_API_KEY = import.meta.env.VITE_OPENROUTER_API_KEY;
-
+// ===================== OpenRouter (via serverless API) =====================
 async function callOpenRouter(prompt: string): Promise<string> {
-  if (!OPENROUTER_API_KEY) {
-    throw new Error("OpenRouter API key is missing");
-  }
-
-  const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+  const res = await fetch("/api/generate-text", {
     method: "POST",
-    headers: {
-      "Authorization": `Bearer ${OPENROUTER_API_KEY}`,
-      "Content-Type": "application/json",
-      "HTTP-Referer": "https://qhan.me",
-      "X-Title": "MySlides"
-    },
-    body: JSON.stringify({
-      model: "meta-llama/llama-3.1-8b-instruct",
-      messages: [
-        { role: "user", content: prompt }
-      ]
-    })
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ prompt })
   });
 
-  if (!response.ok) {
-    const err = await response.text();
-    throw new Error(err);
+  if (!res.ok) {
+    throw new Error(await res.text());
   }
 
-  const data = await response.json();
+  const data = await res.json();
   return data.choices[0].message.content;
 }
+
 
 // ---------- Generate Basic Text ----------
 export async function generateSlides(prompt: string): Promise<string> {
