@@ -1,3 +1,7 @@
+export const config = {
+  runtime: "nodejs",
+};
+
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
@@ -6,8 +10,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   const { prompt } = req.body;
-  const apiKey = process.env.OPENROUTER_API_KEY;
 
+  const apiKey = process.env.OPENROUTER_API_KEY;
   if (!apiKey) {
     return res.status(500).json({ error: "API key missing on server" });
   }
@@ -28,4 +32,3 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const data = await response.json();
   return res.status(200).json(data);
 }
-
