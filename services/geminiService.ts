@@ -158,11 +158,11 @@ Now create a structured JSON array of exactly 10 slides about: ${topic}.
 Each slide must follow the defined format exactly.
 `;
 
-  const result = await textModel.generateContent(prompt);
+  const rawResponse = await callOpenRouter(prompt);
   updateLoadingMessage("Parsing content structure...");
 
   // --- Extract JSON ---
-  let rawText = result.response.text().trim();
+  let rawText = rawResponse.trim();
   rawText = rawText
     .replace(/^```json\s*/i, "")
     .replace(/^```/, "")
