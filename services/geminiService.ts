@@ -1,14 +1,42 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+
 import { CardData } from "../types";
 
-// Initialize Gemini model using Google AI Studio API key
-const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY);
-const textModel = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+// ===================== OpenRouter Setup =====================
+const OPENROUTER_API_KEY = import.meta.env.VITE_OPENROUTER_API_KEY;
+
+async function callOpenRouter(prompt: string): Promise<string> {
+  if (!OPENROUTER_API_KEY) {
+    throw new Error("OpenRouter API key is missing");
+  }
+
+  const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${OPENROUTER_API_KEY}`,
+      "Content-Type": "application/json",
+      "HTTP-Referer": "https://qhan.me",
+      "X-Title": "MySlides"
+    },
+    body: JSON.stringify({
+      model: "meta-llama/llama-3.1-8b-instruct",
+      messages: [
+        { role: "user", content: prompt }
+      ]
+    })
+  });
+
+  if (!response.ok) {
+    const err = await response.text();
+    throw new Error(err);
+  }
+
+  const data = await response.json();
+  return data.choices[0].message.content;
+}
 
 // ---------- Generate Basic Text ----------
 export async function generateSlides(prompt: string): Promise<string> {
-  const result = await textModel.generateContent(prompt);
-  return result.response.text();
+  return await callOpenRouter(prompt);
 }
 
 // ---------- Generate Image for Each Slide ----------
