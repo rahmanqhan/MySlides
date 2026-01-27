@@ -115,7 +115,7 @@ const PromptScreen: React.FC<PromptScreenProps> = ({ onGenerate, error }) => {
     </div>
 
     <div className="fixed bottom-5 left-1/2 -translate-x-1/2 text-gray-600 text-sm font-sans">
-      @rahmanqhan
+      @rahmanqan
     </div>
   </>
 );
